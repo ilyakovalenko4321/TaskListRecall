@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tasklist?currentSchema=tasklist
+    username: postgres
+    password: Rts28022007
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      continue-on-error: false
+
+security:
+  jwt:
+    secret: U3VwZXJTZWNyZXRTZWNyZXRUb05vdmVvbmVDYW5EZWNyaXB0SXQ=
+    access: 3600000
+    refresh: 2592000000
