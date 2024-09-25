@@ -12,5 +12,5 @@ spring:
 security:
   jwt:
     secret: U3VwZXJTZWNyZXRTZWNyZXRUb05vdmVvbmVDYW5EZWNyaXB0SXQ=
-    access: 3600000
-    refresh: 2592000000
+    access: 1
+    refresh: 360
