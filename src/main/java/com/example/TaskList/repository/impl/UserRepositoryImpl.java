@@ -119,31 +119,23 @@ public class UserRepositoryImpl implements UserRepository {
      */
     @Override
     public void create(User user) {
-        try (Connection connection = dataSourceConfig.getConnection()) {
-            String CREATE = """
-                    INSERT INTO users(name, username, password)
-                    VALUES(?,?,?)
-                    """;
-            try (PreparedStatement statement = connection.prepareStatement(CREATE, Statement.RETURN_GENERATED_KEYS)) {
-                statement.setString(1, user.getName());
-                statement.setString(2, user.getUsername());
-                statement.setString(3, user.getPassword());
-                int affectedRows = statement.executeUpdate();
-
-                if (affectedRows == 0) {
-                    throw new SQLException("Creating user failed, no rows affected.");
-                }
-
-                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        user.setId(generatedKeys.getLong(1));
-                    } else {
-                        throw new SQLException("Creating user failed, no ID obtained.");
-                    }
-                }
+        String CREATE = """
+                INSERT INTO users(name, username, password)
+                VALUES(?,?,?)
+                """;
+        try{
+            Connection connection = dataSourceConfig.getConnection();
+            PreparedStatement statement = connection.prepareStatement(CREATE, PreparedStatement.RETURN_GENERATED_KEYS);
+            statement.setString(1,user.getName());
+            statement.setString(2, user.getUsername());
+            statement.setString(3, user.getPassword());
+            statement.executeUpdate();
+            try(ResultSet rs = statement.getGeneratedKeys()){
+                rs.next();
+                user.setId(rs.getLong(1));
             }
         } catch (SQLException e) {
-            throw new ResourceMappingException("Error while creating user: " + e.getMessage());
+            throw new ResourceMappingException("EXCEPTION while updating user");
         }
     }
 
@@ -158,6 +150,7 @@ public class UserRepositoryImpl implements UserRepository {
             PreparedStatement statement = connection.prepareStatement(INSERT_USER_ROLE);
             statement.setLong(1, userId);
             statement.setString(2, role.name());
+            statement.executeUpdate();
         }catch(SQLException throwables){
             throw new ResourceMappingException("Error while insert role to user");
         }

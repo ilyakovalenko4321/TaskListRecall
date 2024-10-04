@@ -16,6 +16,7 @@ public class UserRowMapper {
     public static User mapRow(ResultSet resultSet){
         Set<Role> roles = new HashSet<>();
         while(resultSet.next()){
+            //TODO: Не работает
             roles.add(Role.valueOf(resultSet.getString("user_role_role")));
         }
         resultSet.beforeFirst();
