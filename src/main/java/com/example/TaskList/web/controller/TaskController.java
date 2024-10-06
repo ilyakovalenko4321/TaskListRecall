@@ -6,6 +6,7 @@ import com.example.TaskList.web.dto.task.TaskDto;
 import com.example.TaskList.web.dto.validation.OnUpdate;
 import com.example.TaskList.web.mappers.TaskMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +21,14 @@ public class TaskController {
     private final TaskMapper taskMapper;
 
     @GetMapping("/{id}")
+    @PreAuthorize("canAccessTask(#id)")
     public TaskDto getById(@PathVariable Long id){
-        //TODO: Why we adress to service, we must adress to repository
         Task task = taskService.getById(id);
         return taskMapper.toDto(task);
     }
 
     @PutMapping
+    @PreAuthorize("canAccessTask(#dto.id)")
     public TaskDto update(@Validated(OnUpdate.class) @RequestBody TaskDto dto){
         Task task = taskMapper.toEntity(dto);
         Task updatedTask = taskService.update(task);
@@ -34,6 +36,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("canAccessTask(#id)")
     public void deleteById(@PathVariable Long id){
         taskService.delete(id);
     }

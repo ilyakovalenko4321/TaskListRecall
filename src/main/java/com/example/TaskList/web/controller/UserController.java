@@ -11,7 +11,7 @@ import com.example.TaskList.web.dto.validation.OnUpdate;
 import com.example.TaskList.web.mappers.TaskMapper;
 import com.example.TaskList.web.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.control.MappingControl;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +32,7 @@ public class UserController {
 
     //Do not understand what is RequestBody for
     @PutMapping
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#dto.id)")
     public UserDto update(@Validated(OnUpdate.class) @RequestBody UserDto dto){
         User user = userMapper.toEntity(dto);
         User updatedUser = userService.update(user);
@@ -39,23 +40,27 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public UserDto getById(@PathVariable Long id){
         User user = userService.getById(id);
         return userMapper.toDto(user);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public void deleteById(@PathVariable Long id){
         userService.delete(id);
     }
 
     @GetMapping("/{id}/tasks")
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public List<TaskDto> getTasksByUserId(@PathVariable Long id){
         List<Task> tasks = taskService.getAllByUserId(id);
         return taskMapper.toDto(tasks);
     }
 
     @PostMapping("/{id}/tasks")
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public TaskDto createTask(@PathVariable Long id,
                               @Validated(OnCreate.class) @RequestBody TaskDto dto){
         Task task = taskMapper.toEntity(dto);
