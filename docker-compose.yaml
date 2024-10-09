@@ -1,5 +1,9 @@
 version: '3'
 
+volumes:
+  cache:
+    driver: local
+
 services:
   app:
     build:
@@ -22,3 +26,12 @@ services:
       - POSTGRES_DB=tasklist
     volumes:
       - ./src/main/resources/db-init:/docker-entrypoint-initdb.d
+  redis:
+    image: redis:7.2-rc-alpine
+    restart: always
+    container_name: redis
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning -requirepass
+    volumes:
+      - cache:/data
