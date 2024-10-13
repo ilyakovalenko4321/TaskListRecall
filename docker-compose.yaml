@@ -1,5 +1,3 @@
-version: '3'
-
 volumes:
   cache:
     driver: local
@@ -11,12 +9,14 @@ services:
     container_name: tasklist
     depends_on:
       - db
+      - redis
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/tasklist?currentSchema=tasklist
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=Rts28022007
     ports:
       - '8080:8080'
+    restart: always  # Добавлено для автоматического перезапуска при сбоях
   db:
     image: postgres:16
     container_name: postgres
@@ -26,12 +26,15 @@ services:
       - POSTGRES_DB=tasklist
     volumes:
       - ./src/main/resources/db-init:/docker-entrypoint-initdb.d
+    restart: always  # Добавлено для автоматического перезапуска при сбоях
+
+
   redis:
     image: redis:7.2-rc-alpine
-    restart: always
+    restart: on-failure
     container_name: redis
     ports:
       - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning -requirepass
+    command: redis-server --save 20 1 --loglevel warning --requirepass d2VyZ3RqdWZnaGdk
     volumes:
       - cache:/data

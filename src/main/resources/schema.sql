@@ -32,4 +32,4 @@ create table if not exists users_roles
     role varchar(255) not null,
     primary key (user_id, role),
     constraint fk_users_role_users foreign key (user_id) references users (id) on delete cascade on update no action
-    )
+)
