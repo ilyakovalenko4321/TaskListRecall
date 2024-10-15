@@ -16,7 +16,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=Rts28022007
     ports:
       - '8080:8080'
-    restart: always  # Добавлено для автоматического перезапуска при сбоях
+
   db:
     image: postgres:16
     container_name: postgres
@@ -26,12 +26,11 @@ services:
       - POSTGRES_DB=tasklist
     volumes:
       - ./src/main/resources/db-init:/docker-entrypoint-initdb.d
-    restart: always  # Добавлено для автоматического перезапуска при сбоях
 
 
   redis:
     image: redis:7.2-rc-alpine
-    restart: on-failure
+    restart: always
     container_name: redis
     ports:
       - '6379:6379'
