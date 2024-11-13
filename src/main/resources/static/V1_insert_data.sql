@@ -1,0 +1,20 @@
+insert into users (id, name, username, password)
+values (1,'John Doe', 'johndoe@gmail.com', '$2a$10$XWi8boLlox8OmsVaJSgoz.4nTp7a5a4VVBZHsUgaMT.AcoZ7/gCxq'),
+       (2,'Mike Smith', 'mikesmith@gmail.com', '$2a$10$XWi8boLlox8OmsVaJSgoz.4nTp7a5a4VVBZHsUgaMT.AcoZ7/gCxq');
+
+insert into tasks(id, title, description, status, expiration_date)
+values (1,'Buy cheese', null, 'TODO', '2025-01-24 12:00:00'),
+       (2,'Do homework', 'Math, Phisics, Literature', 'IN_PROGRESS', '20205-01-31 00:00:00'),
+       (3,'Clean rooms', null, 'DONE', null),
+       (4, 'Call Mike', 'Ask about meeting', 'TODO', '2025-02-01 00:00:00');
+
+insert into users_tasks(user_id, task_id)
+values (2, 1),
+       (2, 2),
+       (2, 3),
+       (1, 4);
+
+insert into users_roles(user_id, role)
+values (1, 'ROLE_ADMIN'),
+       (1, 'ROLE_USER'),
+       (2, 'ROLE_USER')
