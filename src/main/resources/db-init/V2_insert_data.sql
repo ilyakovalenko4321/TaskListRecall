@@ -1,6 +1,6 @@
 insert into users (id, name, username, password)
-values (1,'John Doe', 'johndoe@gmail.com', '$2a$10$XWi8boLlox8OmsVaJSgoz.4nTp7a5a4VVBZHsUgaMT.AcoZ7/gCxq'),
-       (2,'Mike Smith', 'mikesmith@gmail.com', '$2a$10$XWi8boLlox8OmsVaJSgoz.4nTp7a5a4VVBZHsUgaMT.AcoZ7/gCxq');
+values (1,'testUser1', 'testUser1', 'testUser1'),
+       (2,'testUser2', 'testUser2', 'testUser2');
 
 insert into tasks(id, title, description, status, expiration_date)
 values (1,'Buy cheese', null, 'TODO', '2025-01-24 12:00:00'),
