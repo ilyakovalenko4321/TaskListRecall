@@ -23,6 +23,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             INSERT INTO users_tasks (user_id, task_id)
             VALUES (:userId, :taskId)
             """, nativeQuery = true)
+
     void assignTask(Long userId, Long taskId);
 
 }
