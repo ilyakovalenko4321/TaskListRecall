@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users
     password varchar(255) not null
 );
 
+ALTER SEQUENCE users_id_seq RESTART WITH 3;
+
 CREATE TABLE IF NOT EXISTS tasks
 (
     id bigserial primary key,
@@ -16,6 +18,8 @@ CREATE TABLE IF NOT EXISTS tasks
     status varchar(255) not null,
     expiration_date timestamp null
 );
+
+ALTER SEQUENCE tasks_id_seq RESTART WITH 5;
 
 CREATE TABLE IF NOT EXISTS users_tasks
 (

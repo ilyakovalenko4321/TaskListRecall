@@ -6,6 +6,9 @@ import com.ilyaKovalenko.SelfWritedTaskList.domain.Task.Task;
 import com.ilyaKovalenko.SelfWritedTaskList.repository.TaskRepository;
 import com.ilyaKovalenko.SelfWritedTaskList.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +22,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "TasService::getById", key = "#id")
     public Task getById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Unable to find task by this id"));
     }
 
+    //TODO: Implement caching for this method. Not by updates, but with CacheEvict, if user change smt
     @Override
     @Transactional(readOnly = true)
     public List<Task> getAllByUserId(Long userId) {
@@ -32,6 +37,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @Cacheable(value = "TaskService::getById", key = "#task.id")
     public Task create(Task task, Long userId) {
         if(task.getStatus() == null){
             task.setStatus(Status.TODO);
@@ -42,6 +48,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @CachePut(value = "TaskService::getById", key = "#task.id")
     public Task update(Task task) {
         if(task.getStatus() == null){
             task.setStatus(Status.TODO);
@@ -52,6 +59,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "TaskService::getById", key = "#id")
     public void delete(Long id) {
         taskRepository.deleteById(id);
     }
