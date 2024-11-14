@@ -1,0 +1,59 @@
+
+services:
+  app:
+    build:
+      context: .
+    container_name: tasklist
+    depends_on:
+      - db
+      - redis
+      - redis_insight
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tasklist?currentSchema=tasklist
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Rts28022007
+    ports:
+      - '8080:8080'
+    networks:
+      - tasklist-network
+
+  db:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Rts28022007
+      POSTGRES_DB: tasklist
+    volumes:
+      - ./src/main/resources/db-init:/docker-entrypoint-initdb.d
+    networks:
+      - tasklist-network
+
+  redis:
+    image: redis:6.0.7
+    container_name: redis
+    restart: always
+    volumes:
+      - redis_volume_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - tasklist-network
+
+  redis_insight:
+    image: redislabs/redisinsight:1.14.0
+    container_name: redis_insight
+    restart: always
+    ports:
+      - "8001:8001"
+    volumes:
+      - redis_insight_volume_data:/db
+    networks:
+      - tasklist-network
+
+networks:
+  tasklist-network:
+
+volumes:
+  redis_volume_data:
+  redis_insight_volume_data:
