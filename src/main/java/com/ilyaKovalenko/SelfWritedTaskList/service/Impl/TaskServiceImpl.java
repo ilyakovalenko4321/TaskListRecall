@@ -36,7 +36,9 @@ public class TaskServiceImpl implements TaskService {
         if(task.getStatus() == null){
             task.setStatus(Status.TODO);
         }
+
         taskRepository.save(task);
+        taskRepository.assignTask(userId, task.getId());
         return task;
     }
 
