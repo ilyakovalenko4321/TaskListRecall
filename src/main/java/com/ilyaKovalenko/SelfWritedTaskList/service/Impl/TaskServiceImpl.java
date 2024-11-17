@@ -35,7 +35,6 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findAllByUserId(userId);
     }
 
-
     @Override
     @Transactional
     @CachePut(value = "TaskService::getById", key = "#task.id")
