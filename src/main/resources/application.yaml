@@ -1,4 +1,5 @@
 spring:
+
   cache:
     type: redis
     cache-names: redis-cache
@@ -18,6 +19,7 @@ spring:
     init:
       mode: never
       continue-on-error: false
+
 
 security:
   jwt:
