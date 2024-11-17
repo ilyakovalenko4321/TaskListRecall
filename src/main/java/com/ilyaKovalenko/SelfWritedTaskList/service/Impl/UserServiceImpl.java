@@ -41,9 +41,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @Caching(cacheable = {
-            @Cacheable(value = "UserService::getById", key = "#user.id"),
-            @Cacheable(value = "UserService::getByUsername", key = "#user.username")
+    @Caching(put = {
+            @CachePut(value = "UserService::getById", key = "#user.id"),
+            @CachePut(value = "UserService::getByUsername", key = "#user.username")
     })
     public User create(User user) {
         if(userRepository.findByUsername(user.getUsername()).isPresent()){
@@ -59,7 +59,6 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
 
         return user;
-
     }
 
     @Override
