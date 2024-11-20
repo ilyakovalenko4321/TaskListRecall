@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponse login(JwtRequest loginRequest) {
+    public JwtResponse loginByUsername(JwtRequest loginRequest) {
         JwtResponse jwtResponse = new JwtResponse();
         authenticationManager.authenticate
                 (new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -38,6 +38,42 @@ public class AuthServiceImpl implements AuthService {
         jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
 
         return jwtResponse;
+    }
+
+    @Override
+    public JwtResponse loginByEmail(JwtRequest loginRequest) {
+
+        JwtResponse jwtResponse = new JwtResponse();
+        authenticationManager.authenticate
+                (new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+        User user = userService.getByEmail(loginRequest.getEmail());
+
+        jwtResponse.setId(user.getId());
+        jwtResponse.setUsername(user.getUsername());
+        jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
+        jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
+
+        return jwtResponse;
 
     }
+
+    @Override
+    public JwtResponse loginByPhoneNumber(JwtRequest loginRequest) {
+
+        JwtResponse jwtResponse = new JwtResponse();
+        authenticationManager.authenticate
+                (new UsernamePasswordAuthenticationToken(loginRequest.getPhoneNumber(), loginRequest.getPassword()));
+
+        User user = userService.getByPhoneNumber(loginRequest.getPhoneNumber());
+
+        jwtResponse.setId(user.getId());
+        jwtResponse.setUsername(user.getUsername());
+        jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
+        jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
+
+        return jwtResponse;
+
+    }
+
 }

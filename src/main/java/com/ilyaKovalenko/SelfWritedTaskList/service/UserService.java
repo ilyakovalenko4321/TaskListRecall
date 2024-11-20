@@ -6,6 +6,10 @@ public interface UserService {
 
     User getById(Long id);
 
+    User getByEmail(String email);
+
+    User getByPhoneNumber(String phoneNumber);
+
     User getByUsername(String username);
 
     User create(User user);
@@ -16,5 +20,6 @@ public interface UserService {
 
     void delete(Long id);
 
+    User getByIdentifier(String identifier);
 
 }

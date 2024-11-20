@@ -40,16 +40,46 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "UserService::getByEmail", key = "#email")
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found by email"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "UserService::getByIdentifier", key = "#identifier")
+    public User getByIdentifier(String identifier) {
+        return userRepository.findByIdentifier(identifier)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found by username"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "UserService::getByPhoneNumber", key = "#phoneNumber")
+    public User getByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found by phone number"));
+    }
+
+    @Override
     @Transactional
     @Caching(put = {
             @CachePut(value = "UserService::getById", key = "#user.id"),
             @CachePut(value = "UserService::getByUsername", key = "#user.username")
     })
     public User create(User user) {
-        if(userRepository.findByUsername(user.getUsername()).isPresent()){
+
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new IllegalStateException("Username must be unique");
+        } else if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalStateException("Email must be unique");
+        } else if (userRepository.findByPhoneNumber(user.getPhoneNumber()).isPresent()) {
+            throw new IllegalStateException("Phone number must be unique");
         }
-        if(!user.getPassword().equals(user.getPasswordConfirmation())){
+
+        if (!user.getPassword().equals(user.getPasswordConfirmation())) {
             throw new IllegalStateException("Password and password confirmation do not match");
         }
 

@@ -10,10 +10,7 @@ import com.ilyaKovalenko.SelfWritedTaskList.web.dto.validation.OnCreate;
 import com.ilyaKovalenko.SelfWritedTaskList.web.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -26,11 +23,23 @@ public class AuthController {
 
     private final UserMapper userMapper;
 
-    @PostMapping(path = "/login")
-    public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest){
-        return authService.login(loginRequest);
+    //ToDo: Add ability to chose by what you will be login
+    @PostMapping(path = "/login/username")
+    public JwtResponse loginByUsername(@Validated @RequestBody JwtRequest loginRequest){
+        return authService.loginByUsername(loginRequest);
     }
 
+    @PostMapping("/login/email")
+    public JwtResponse loginByEmail(@Validated @RequestBody JwtRequest loginRequest){
+        return authService.loginByEmail(loginRequest);
+    }
+
+    @PostMapping("/login/phone_number")
+    public JwtResponse loginByPhoneNumber(@Validated @RequestBody JwtRequest loginRequest){
+        return authService.loginByPhoneNumber(loginRequest);
+    }
+
+    //ToDo: Add a email confirmation
     @PostMapping(path = "/register")
     public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto dto){
         User user = userMapper.toEntity(dto);

@@ -21,6 +21,8 @@ public class UserMapperImpl implements UserMapper {
         userDto.setUsername( user.getUsername() );
         userDto.setPassword( user.getPassword() );
         userDto.setPasswordConfirmation( user.getPasswordConfirmation() );
+        userDto.setEmail(user.getEmail());
+        userDto.setPhoneNumber(user.getPhoneNumber());
 
         return userDto;
     }
@@ -33,11 +35,13 @@ public class UserMapperImpl implements UserMapper {
 
         User user = new User();
 
-        user.setId( dto.getId() );
+        user.setId(dto.getId());
         user.setName( dto.getName() );
         user.setUsername( dto.getUsername() );
         user.setPassword( dto.getPassword() );
         user.setPasswordConfirmation( dto.getPasswordConfirmation() );
+        user.setEmail(dto.getEmail());
+        user.setPhoneNumber(dto.getPhoneNumber());
 
         return user;
     }

@@ -10,6 +10,11 @@ spring:
       port: 6379
       password: Rts28022007
 
+  liquibase:
+    change-log: classpath*:liquibase/db.changelog.yaml
+    enabled: true
+    default-schema: tasklist
+
   datasource:
     url: jdbc:postgresql://localhost:5432/tasklist?currentSchema=tasklist
     username: postgres

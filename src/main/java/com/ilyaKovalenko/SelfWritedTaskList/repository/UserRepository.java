@@ -23,5 +23,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
             )""", nativeQuery = true)
     boolean isTaskOwner(@Param("userId") Long userId, @Param("taskId") Long taskId);
 
+    @Query(value = """
+            SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email
+            """)
+    Optional<User> findByEmail(@Param("email") String email);
+
+    @Query(value = """
+            SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.phoneNumber = :phoneNumber
+            """)
+    Optional<User> findByPhoneNumber(@Param("phoneNumber") String phoneNumber);
+
+    @Query( value = """
+          SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username = :identifier OR u.email = :identifier OR u.phoneNumber = :identifier
+          """)
+    Optional<User> findByIdentifier(@Param("identifier") String identifier);
+
 
 }

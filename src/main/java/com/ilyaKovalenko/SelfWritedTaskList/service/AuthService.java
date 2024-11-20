@@ -7,6 +7,10 @@ public interface AuthService {
 
     JwtResponse refresh(String request);
 
-    JwtResponse login(JwtRequest request);
+    JwtResponse loginByUsername(JwtRequest request);
+
+    JwtResponse loginByEmail(JwtRequest request);
+
+    JwtResponse loginByPhoneNumber(JwtRequest request);
 
 }
