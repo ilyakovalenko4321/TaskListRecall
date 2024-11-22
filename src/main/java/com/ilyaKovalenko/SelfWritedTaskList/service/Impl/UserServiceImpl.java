@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found by email"));
     }
 
+    //ToDO: Solve problem with user with id 3
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "UserService::getByIdentifier", key = "#identifier")

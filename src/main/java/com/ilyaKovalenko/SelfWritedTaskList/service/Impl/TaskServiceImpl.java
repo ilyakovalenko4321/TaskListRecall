@@ -3,7 +3,9 @@ package com.ilyaKovalenko.SelfWritedTaskList.service.Impl;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.Exception.ResourceNotFoundException;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.Task.Status;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.Task.Task;
+import com.ilyaKovalenko.SelfWritedTaskList.domain.Task.TaskImage;
 import com.ilyaKovalenko.SelfWritedTaskList.repository.TaskRepository;
+import com.ilyaKovalenko.SelfWritedTaskList.service.ImageService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +21,7 @@ import java.util.List;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final ImageService imageService;
 
     @Override
     @Transactional(readOnly = true)
@@ -39,7 +42,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     @CachePut(value = "TaskService::getById", key = "#task.id")
     public Task create(Task task, Long userId) {
-        if(task.getStatus() == null){
+        if (task.getStatus() == null) {
             task.setStatus(Status.TODO);
         }
         taskRepository.save(task);
@@ -51,7 +54,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     @CachePut(value = "TaskService::getById", key = "#task.id")
     public Task update(Task task) {
-        if(task.getStatus() == null){
+        if (task.getStatus() == null) {
             task.setStatus(Status.TODO);
         }
         taskRepository.save(task);
@@ -64,5 +67,15 @@ public class TaskServiceImpl implements TaskService {
     @CacheEvict(value = "TaskService::getById", key = "#id")
     public void delete(Long id) {
         taskRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "TaskService::getById", key = "#id")
+    public void uploadImage(Long id, TaskImage image) {
+        Task task = getById(id);
+        String fileName = imageService.upload(image);
+        task.getImages().add(fileName);
+        taskRepository.save(task);
     }
 }

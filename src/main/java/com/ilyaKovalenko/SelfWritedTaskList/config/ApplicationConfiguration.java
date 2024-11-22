@@ -1,7 +1,9 @@
 package com.ilyaKovalenko.SelfWritedTaskList.config;
 
+import com.ilyaKovalenko.SelfWritedTaskList.service.props.MinioProperties;
 import com.ilyaKovalenko.SelfWritedTaskList.web.security.JwtTokenFilter;
 import com.ilyaKovalenko.SelfWritedTaskList.web.security.JwtTokenProvider;
+import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +29,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class ApplicationConfiguration {
 
     private final JwtTokenProvider tokenProvider;
+    private final MinioProperties minioProperties;
 
+    @Bean
+    public MinioClient minioClient(){
+        return MinioClient.builder()
+                .endpoint(minioProperties.getUrl())
+                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
+                .build();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
