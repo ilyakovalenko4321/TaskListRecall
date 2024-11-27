@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -47,15 +48,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found by email"));
     }
 
-    //ToDO: Solve problem with user with id 3
-    @Override
-    @Transactional(readOnly = true)
-    @Cacheable(value = "UserService::getByIdentifier", key = "#identifier")
-    public User getByIdentifier(String identifier) {
-        return userRepository.findByIdentifier(identifier)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found by username"));
-    }
-
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "UserService::getByPhoneNumber", key = "#phoneNumber")
@@ -68,8 +60,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Caching(put = {
             @CachePut(value = "UserService::getById", key = "#user.id"),
-            @CachePut(value = "UserService::getByUsername", key = "#user.username")
-    })
+            @CachePut(value = "UserService::getByUsername", key = "#user.username")})
     public User create(User user) {
 
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
@@ -100,6 +91,16 @@ public class UserServiceImpl implements UserService {
             @CachePut(value = "UserService::getByUsername", key = "#user.username")
     })
     public User update(User user) {
+
+        User existingUser = getById(user.getId());
+
+        if (!Objects.equals(user.getEmail(), existingUser.getEmail())) {
+            //ToDo add email confirmation
+        }
+
+        if (!user.getPassword().equals(user.getPasswordConfirmation())) {
+            throw new IllegalStateException("Password and password confirmation do not match");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return user;

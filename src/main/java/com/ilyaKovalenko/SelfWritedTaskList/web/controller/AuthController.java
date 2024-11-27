@@ -23,20 +23,9 @@ public class AuthController {
 
     private final UserMapper userMapper;
 
-    //ToDo: Add ability to chose by what you will be login
-    @PostMapping(path = "/login/username")
-    public JwtResponse loginByUsername(@Validated @RequestBody JwtRequest loginRequest){
-        return authService.loginByUsername(loginRequest);
-    }
-
-    @PostMapping("/login/email")
-    public JwtResponse loginByEmail(@Validated @RequestBody JwtRequest loginRequest){
-        return authService.loginByEmail(loginRequest);
-    }
-
-    @PostMapping("/login/phone_number")
-    public JwtResponse loginByPhoneNumber(@Validated @RequestBody JwtRequest loginRequest){
-        return authService.loginByPhoneNumber(loginRequest);
+    @PostMapping(path = "/login")
+    public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest){
+        return authService.login(loginRequest);
     }
 
     //ToDo: Add a email confirmation

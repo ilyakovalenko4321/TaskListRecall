@@ -20,6 +20,5 @@ public interface UserService {
 
     void delete(Long id);
 
-    User getByIdentifier(String identifier);
 
 }

@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query(value = """
@@ -24,4 +23,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             VALUES (:userId, :taskId)
             """, nativeQuery = true)
     void assignTaskToUser(Long userId, Long taskId);
+
+    @Query(value = """
+            INSERT INTO tasks_images (task_id, image)
+            VALUES (:id, :fileName)
+            """, nativeQuery = true)
+    void addImage(@Param("id") Long id, @Param("fileName") String fileName);
 }

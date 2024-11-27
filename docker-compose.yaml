@@ -18,7 +18,7 @@ services:
     networks:
       - app-network
     ports:
-      - "6379:6379"
+      - "6380:6379"
     command: redis-server --save 20 1 --loglevel warning --requirepass Rts28022007
     volumes:
       - redis_volume_data:/data

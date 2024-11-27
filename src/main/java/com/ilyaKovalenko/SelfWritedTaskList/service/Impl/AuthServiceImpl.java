@@ -25,13 +25,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponse loginByUsername(JwtRequest loginRequest) {
+    public JwtResponse login(JwtRequest loginRequest) {
         JwtResponse jwtResponse = new JwtResponse();
-        authenticationManager.authenticate
-                (new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        User user = userService.getByUsername(loginRequest.getUsername());
+        // Определяем, какой тип данных был передан (username, email, phoneNumber)
+        String identifier = loginRequest.getUsername();
 
+        if (identifier == null || identifier.isEmpty()) {
+            throw new IllegalArgumentException("Username, email, or phone number must be provided.");
+        }
+
+        // Аутентификация
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(identifier, loginRequest.getPassword()));
+
+        // Получаем пользователя в зависимости от типа идентификатора
+        User user;
+        if (identifier.contains("@")) {  // Проверяем, если это email
+            user = userService.getByEmail(identifier);
+        } else if (identifier.matches("[0-9]+")) {  // Проверяем, если это номер телефона
+            user = userService.getByPhoneNumber(identifier);
+        } else {  // Предполагаем, что это username
+            user = userService.getByUsername(identifier);
+        }
+
+        // Формируем JWT-ответ
         jwtResponse.setId(user.getId());
         jwtResponse.setUsername(user.getUsername());
         jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
@@ -40,40 +57,5 @@ public class AuthServiceImpl implements AuthService {
         return jwtResponse;
     }
 
-    @Override
-    public JwtResponse loginByEmail(JwtRequest loginRequest) {
-
-        JwtResponse jwtResponse = new JwtResponse();
-        authenticationManager.authenticate
-                (new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
-        User user = userService.getByEmail(loginRequest.getEmail());
-
-        jwtResponse.setId(user.getId());
-        jwtResponse.setUsername(user.getUsername());
-        jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
-        jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
-
-        return jwtResponse;
-
-    }
-
-    @Override
-    public JwtResponse loginByPhoneNumber(JwtRequest loginRequest) {
-
-        JwtResponse jwtResponse = new JwtResponse();
-        authenticationManager.authenticate
-                (new UsernamePasswordAuthenticationToken(loginRequest.getPhoneNumber(), loginRequest.getPassword()));
-
-        User user = userService.getByPhoneNumber(loginRequest.getPhoneNumber());
-
-        jwtResponse.setId(user.getId());
-        jwtResponse.setUsername(user.getUsername());
-        jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
-        jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
-
-        return jwtResponse;
-
-    }
 
 }

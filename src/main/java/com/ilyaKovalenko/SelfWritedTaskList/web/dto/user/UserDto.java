@@ -23,8 +23,9 @@ public class UserDto {
     @Length(max = 255, message = "Username length must be less then 255 symbols", groups = {OnCreate.class, OnUpdate.class})
     private String username;
 
-    @NotNull
+
     @Email
+    @NotNull(groups = {OnCreate.class})
     private String email;
 
     @NumberFormat
@@ -35,7 +36,7 @@ public class UserDto {
     private String password;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotNull(message = "Confirmation must be not null", groups = OnCreate.class)
+    @NotNull(message = "Confirmation must be not null", groups = {OnCreate.class, OnUpdate.class})
     private String passwordConfirmation;
 
 }
