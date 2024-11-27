@@ -38,6 +38,7 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findAllByUserId(userId);
     }
 
+
     @Override
     @Transactional
     @CachePut(value = "TaskService::getById", key = "#task.id")
@@ -45,8 +46,11 @@ public class TaskServiceImpl implements TaskService {
         if (task.getStatus() == null) {
             task.setStatus(Status.TODO);
         }
+
         taskRepository.save(task);
+
         taskRepository.assignTaskToUser(userId, task.getId());
+
         return task;
     }
 
