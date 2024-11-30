@@ -20,11 +20,26 @@ spring:
     username: postgres
     password: Rts28022007
     driver-class-name: org.postgresql.Driver
+
   sql:
     init:
       mode: never
       continue-on-error: false
 
+  mail:
+    host: smtp.gmail.com
+    username: tasklisttestmail@gmail.com
+    password: rkbnyuersmgjukyz
+    port: 587
+    properties:
+      mail:
+        debug: false
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 security:
   jwt:

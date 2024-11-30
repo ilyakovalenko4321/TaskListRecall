@@ -6,6 +6,7 @@ import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.auth.JwtRequest;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.auth.JwtResponse;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.user.UserDto;
+import com.ilyaKovalenko.SelfWritedTaskList.web.dto.validation.OnConfirm;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.validation.OnCreate;
 import com.ilyaKovalenko.SelfWritedTaskList.web.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,12 @@ public class AuthController {
         User user = userMapper.toEntity(dto);
         User newUser = userService.create(user);
         return userMapper.toDto(newUser);
+    }
+
+    @DeleteMapping(path = "/email/confirm")
+    public UserDto confirmEmail(@Validated(OnConfirm.class) @RequestBody JwtRequest confirmationRequest){
+        return authService.confirmEmail(confirmationRequest);
+
     }
 
     @PostMapping(path = "/refresh")

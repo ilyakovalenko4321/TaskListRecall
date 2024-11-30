@@ -5,6 +5,8 @@ import com.ilyaKovalenko.SelfWritedTaskList.service.AuthService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.auth.JwtRequest;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.auth.JwtResponse;
+import com.ilyaKovalenko.SelfWritedTaskList.web.dto.user.UserDto;
+import com.ilyaKovalenko.SelfWritedTaskList.web.mappers.UserMapper;
 import com.ilyaKovalenko.SelfWritedTaskList.web.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +20,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserMapper userMapper;
 
     @Override
     public JwtResponse refresh(String refreshRequest) {
@@ -57,5 +60,26 @@ public class AuthServiceImpl implements AuthService {
         return jwtResponse;
     }
 
+    @Override
+    public UserDto confirmEmail(JwtRequest request){
+
+        String identifier = request.getUsername();
+        String attemptAccessKey = request.getConfirmationCode();
+        User user;
+        if (identifier.contains("@")) {  // Проверяем, если это email
+            user = userService.getByEmail(identifier);
+        } else if (identifier.matches("[0-9]+")) {  // Проверяем, если это номер телефона
+            user = userService.getByPhoneNumber(identifier);
+        } else {  // Предполагаем, что это username
+            user = userService.getByUsername(identifier);
+        }
+
+        Long id = user.getId();
+        String accessKey = userService.getAccessKey(id);
+        if(attemptAccessKey.equals(accessKey)){
+            userService.activateUser(id);
+        }
+        return userMapper.toDto(user);
+    }
 
 }

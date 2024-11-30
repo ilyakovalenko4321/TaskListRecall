@@ -7,6 +7,7 @@ import com.ilyaKovalenko.SelfWritedTaskList.service.Impl.AuthServiceImpl;
 import com.ilyaKovalenko.SelfWritedTaskList.service.Impl.ImageServiceImpl;
 import com.ilyaKovalenko.SelfWritedTaskList.service.Impl.TaskServiceImpl;
 import com.ilyaKovalenko.SelfWritedTaskList.service.Impl.UserServiceImpl;
+import com.ilyaKovalenko.SelfWritedTaskList.service.MailService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.props.JwtProperties;
 import com.ilyaKovalenko.SelfWritedTaskList.service.props.MinioProperties;
 import com.ilyaKovalenko.SelfWritedTaskList.web.security.JwtTokenProvider;
@@ -82,7 +83,7 @@ public class TestConfig {
     ) {
         return new UserServiceImpl(
                 userRepository,
-                testPasswordEncoder()
+                testPasswordEncoder(),
         );
     }
 

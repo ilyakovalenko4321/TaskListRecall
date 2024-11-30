@@ -14,6 +14,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -27,8 +30,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional(readOnly = true)
     @Cacheable(value = "TasService::getById", key = "#id")
     public Task getById(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Unable to find task by this id"));
+        return taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Unable to find task by this id"));
     }
 
     //TODO: Implement caching for this method. Not by updates, but with CacheEvict, if user change smt
@@ -81,6 +83,20 @@ public class TaskServiceImpl implements TaskService {
         String fileName = imageService.upload(image);
         taskRepository.addImage(id, fileName);
 
+    }
 
+    @Override
+    public List<Task> getAllSoonTasks(Duration duration){
+        LocalDateTime now = LocalDateTime.now();
+        return taskRepository.findAllSoonTask(Timestamp.valueOf(now), Timestamp.valueOf(now.plus(duration)));
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllByUserId(Long id) {
+        List<Task> tasks = getAllByUserId(id);
+        List<Long> tasksId = tasks.stream().map(Task::getId).toList();
+        taskRepository.deleteAllByIdInBatch(tasksId);
+        System.out.println("ddd");
     }
 }

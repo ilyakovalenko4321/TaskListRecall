@@ -20,5 +20,13 @@ public interface UserService {
 
     void delete(Long id);
 
+    User getTaskAuthor(Long taskId);
+
+    void deleteAllSoonUnconfirmedUser();
+
+    String getAccessKey(Long id);
+
+    void activateUser(Long id);
+
 
 }

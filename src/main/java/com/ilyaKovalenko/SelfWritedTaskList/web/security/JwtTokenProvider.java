@@ -82,7 +82,7 @@ public class JwtTokenProvider {
         if(!validateToken(refreshToken)){
             throw new AccessDeniedException("Refresh token is not valid");
         }
-        Long userId = Long.valueOf(getId(refreshToken));
+        Long userId = getId(refreshToken);
         User user = userService.getById(userId);
         jwtResponse.setId(userId);
         jwtResponse.setUsername(user.getUsername());
@@ -102,14 +102,14 @@ public class JwtTokenProvider {
         return claims.getPayload().getExpiration().after(new Date());
     }
 
-    private Integer getId(String token){
+    private Long getId(String token){
         return Jwts
                 .parser()
                 .verifyWith((SecretKey) key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("id", Integer.class);
+                .get("id", Long.class);
     }
 
     private String getUsername(String token){

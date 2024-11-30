@@ -15,7 +15,7 @@ public class ControllerAdvice {
         return new ExceptionBody(e.getMessage());
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({AccessDeniedException.class, org.springframework.security.access.AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ExceptionBody handleAccessDenied(AccessDeniedException e){
         return new ExceptionBody(e.getMessage());
@@ -30,7 +30,7 @@ public class ControllerAdvice {
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionBody handleIllegalState(IllegalStateException e){
-        return new ExceptionBody("Access denied.");
+        return new ExceptionBody(e.getMessage());
     }
 
     @ExceptionHandler(ImageUploadException.class)
@@ -39,9 +39,6 @@ public class ControllerAdvice {
         return new ExceptionBody(e.getMessage());
     }
 
-    @ExceptionHandler
-    public ExceptionBody handler(Exception e){
-        return new ExceptionBody(e.getMessage());
-    }
+
 
 }

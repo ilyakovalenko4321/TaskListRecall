@@ -8,7 +8,18 @@ CREATE TABLE IF NOT EXISTS users
     password varchar(255) not null
 );
 
-ALTER SEQUENCE users_id_seq RESTART WITH 3;
+CREATE TABLE IF NOT EXISTS unconfirmed_users(
+
+    user_id bigint not null,
+    expiration_data timestamp not null,
+    registration_attempt int not null,
+    access_key varchar(255) not null,
+    primary key (user_id),
+    constraint fk_unconfirmed_users_users foreign key (user_id) references users (id) on delete cascade on update no action
+
+);
+
+ALTER SEQUENCE users_id_seq RESTART WITH 4;
 
 CREATE TABLE IF NOT EXISTS tasks
 (

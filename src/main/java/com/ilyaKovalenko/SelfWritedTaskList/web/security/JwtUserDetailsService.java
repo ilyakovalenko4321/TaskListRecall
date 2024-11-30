@@ -1,6 +1,9 @@
 package com.ilyaKovalenko.SelfWritedTaskList.web.security;
 
 
+import com.ilyaKovalenko.SelfWritedTaskList.domain.Exception.AccessDeniedException;
+import com.ilyaKovalenko.SelfWritedTaskList.domain.Exception.ResourceNotFoundException;
+import com.ilyaKovalenko.SelfWritedTaskList.domain.User.Role;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.User.User;
 import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +18,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     private final UserService userService;
 
     public JwtEntity loadUserByUsername(String identifier) throws UsernameNotFoundException {
-        User user;
+        User user = new User();
         if (identifier.matches("^\\+?[0-9]{10,15}$")) {
             // Если идентификатор соответствует номеру телефона
             user = userService.getByPhoneNumber(identifier);
@@ -26,8 +29,13 @@ public class JwtUserDetailsService implements UserDetailsService {
             // Если идентификатор соответствует username
             user = userService.getByUsername(identifier);
         } else {
-            throw new UsernameNotFoundException("Invalid identifier format");
+            throw new ResourceNotFoundException("Invalid identifier format");
         }
+
+        if(user.getRoles().contains(Role.ROLE_BLOCKED)){
+            throw new AccessDeniedException("You should confirm your email");
+        }
+
         return JwtEntityFactory.create(user);
     }
 }
