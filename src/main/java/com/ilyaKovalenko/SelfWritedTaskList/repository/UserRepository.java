@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.sql.Timestamp;
 import java.util.Optional;
 
+
 public interface UserRepository extends JpaRepository<User, Long> {
 
 
@@ -60,10 +61,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     WHERE id IN (
         SELECT u_u.user_id
         FROM unconfirmed_users u_u
-        WHERE u_u.expiration_data BETWEEN :start AND :end
+        WHERE u_u.expiration_data > :end
     )
     """, nativeQuery = true)
-    void deleteAllSoonUnconfirmedUser(@Param("start") Timestamp start, @Param("end") Timestamp end);
+    void deleteAllSoonUnconfirmedUser(@Param("end") Timestamp end);
 
     @Query(value = """
             SELECT u_u.access_key
@@ -74,10 +75,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query(value = """
-    UPDATE users_roles
-    SET role = 'ROLE_USER'
-    WHERE user_id = :id AND role = 'ROLE_BLOCKED'
-    """, nativeQuery = true)
+            UPDATE users_roles
+            SET role = 'ROLE_USER'
+            WHERE user_id = :id AND role = 'ROLE_BLOCKED'
+            """, nativeQuery = true)
     void setUserRole(Long id);
 
     @Modifying

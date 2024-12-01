@@ -45,7 +45,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims()
                 .subject(username)
                 .add("id", userId)
-                .add("role", resolveRoles(roles))
+                //.add("role", resolveRoles(roles))
                 .build();
 
         Instant validity = Instant.now().plus(jwtProperties.getAccess(), ChronoUnit.MINUTES);

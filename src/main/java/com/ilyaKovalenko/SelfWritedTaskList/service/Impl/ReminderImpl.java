@@ -8,6 +8,7 @@ import com.ilyaKovalenko.SelfWritedTaskList.service.Reminder;
 import com.ilyaKovalenko.SelfWritedTaskList.service.TaskService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -24,10 +25,9 @@ public class ReminderImpl implements Reminder {
     private final MailService mailService;
     private final Duration DURATIONS = Duration.ofHours(1);
 
-    //@Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Override
     public void remindForTask() {
-
         List<Task> tasks = taskService.getAllSoonTasks(DURATIONS);
         tasks.forEach(task -> {
             User user = userService.getTaskAuthor(task.getId());

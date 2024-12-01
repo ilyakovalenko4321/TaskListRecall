@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
-    private final Duration duration = Duration.ofDays(1);
+    private final Duration duration = Duration.ofHours(1);
     private static final int MAX_ATTEMPTS_TO_CONFIRM = 5;
 
     @Override
@@ -112,7 +113,7 @@ public class UserServiceImpl implements UserService {
 
         User existingUser = getById(user.getId());
         if (!Objects.equals(user.getEmail(), existingUser.getEmail())) {
-            //ToDo add email confirmation
+            //ToDo add email confirmation`
         }
 
         if (!user.getPassword().equals(user.getPasswordConfirmation())) {
@@ -146,11 +147,11 @@ public class UserServiceImpl implements UserService {
         });
     }
 
-    //@Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Override
     @Transactional
     public void deleteAllSoonUnconfirmedUser() {
-        userRepository.deleteAllSoonUnconfirmedUser(Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now().plus(duration)));
+        userRepository.deleteAllSoonUnconfirmedUser(Timestamp.valueOf(LocalDateTime.now().plus(duration)));
     }
 
     @Override
@@ -179,7 +180,7 @@ public class UserServiceImpl implements UserService {
         userRepository.changeAttemptsNumber(id, attempts);
 
         // Если достигнуто максимальное количество попыток (например, 5), удаляем пользователя
-        if (attempts >= 5) {
+        if (attempts >= MAX_ATTEMPTS_TO_CONFIRM) {
             userRepository.deleteById(id);
         }
 

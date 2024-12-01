@@ -29,7 +29,6 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
-    //ToDo: Add a email confirmation
     @PostMapping(path = "/register")
     public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto dto){
         User user = userMapper.toEntity(dto);

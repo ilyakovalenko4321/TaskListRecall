@@ -55,6 +55,7 @@ public class MailServiceImpl implements MailService {
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
         helper.setSubject("You have task to do in 1 hour");
         helper.setTo(user.getEmail());
+        helper.setFrom("tasklisttestmail@gmail.com");
         String emailContent = getReminderEmailContent(user, params);
         helper.setText(emailContent, true);
         mailSender.send(mimeMessage);

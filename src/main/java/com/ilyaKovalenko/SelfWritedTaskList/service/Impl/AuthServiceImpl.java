@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -23,11 +24,16 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserMapper userMapper;
 
+
+    //ToDO: создать logout для удаления user или его token
+
+    @Transactional
     @Override
     public JwtResponse refresh(String refreshRequest) {
         return jwtTokenProvider.refreshUserToken(refreshRequest);
     }
 
+    @Transactional
     @Override
     public JwtResponse login(JwtRequest loginRequest) {
         JwtResponse jwtResponse = new JwtResponse();
@@ -52,9 +58,9 @@ public class AuthServiceImpl implements AuthService {
             user = userService.getByUsername(identifier);
         }
 
-        // Формируем JWT-ответ
         jwtResponse.setId(user.getId());
         jwtResponse.setUsername(user.getUsername());
+
         jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
         jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
 
@@ -62,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDto confirmEmail(JwtRequest request){
+    public UserDto confirmEmail(JwtRequest request) {
 
         String identifier = request.getUsername();
         String attemptAccessKey = request.getConfirmationCode();
@@ -77,14 +83,11 @@ public class AuthServiceImpl implements AuthService {
 
         Long id = user.getId();
         String accessKey = userService.getAccessKey(id);
-        if(attemptAccessKey.equals(accessKey)){
+        if (attemptAccessKey.equals(accessKey)) {
             userService.activateUser(id);
-        }
-        else{
+        } else {
             Integer remainingAttempt = userService.checkAbilityToConfirm(id);
-            throw new IncorrectSecretKeyException("Invalid password. " +
-                    (remainingAttempt == 5 ? "You need to register your user again." : "Remaining attempts: " + remainingAttempt));
-
+            throw new IncorrectSecretKeyException("Invalid password. " + (remainingAttempt == 5 ? "You need to register your user again." : "Remaining attempts: " + remainingAttempt));
         }
         return userMapper.toDto(user);
     }

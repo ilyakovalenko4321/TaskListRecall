@@ -33,7 +33,6 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Unable to find task by this id"));
     }
 
-    //TODO: Implement caching for this method. Not by updates, but with CacheEvict, if user change smt
     @Override
     @Transactional(readOnly = true)
     public List<Task> getAllByUserId(Long userId) {
@@ -47,6 +46,10 @@ public class TaskServiceImpl implements TaskService {
     public Task create(Task task, Long userId) {
         if (task.getStatus() == null) {
             task.setStatus(Status.TODO);
+        }
+
+        if (task.getExpirationDate() == null) {
+            task.setExpirationDate(LocalDateTime.now().plus(Duration.ofHours(24)));
         }
 
         taskRepository.save(task);
@@ -86,7 +89,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getAllSoonTasks(Duration duration){
+    public List<Task> getAllSoonTasks(Duration duration) {
         LocalDateTime now = LocalDateTime.now();
         return taskRepository.findAllSoonTask(Timestamp.valueOf(now), Timestamp.valueOf(now.plus(duration)));
     }

@@ -33,9 +33,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     void addImage(@Param("id") Long id, @Param("fileName") String fileName);
 
     @Query(value = """
-           SELECT title, description
-           FROM tasks t
-           WHERE t.expiration_date between :start and :end
-           """, nativeQuery = true)
+             SELECT * FROM tasks t
+             WHERE t.expiration_date is not null
+             AND t.expiration_date between :start and :end
+            """, nativeQuery = true)
     List<Task> findAllSoonTask(@Param("start") Timestamp start, @Param("end") Timestamp end);
 }
