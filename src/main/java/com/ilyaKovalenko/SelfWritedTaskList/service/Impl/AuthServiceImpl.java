@@ -1,5 +1,6 @@
 package com.ilyaKovalenko.SelfWritedTaskList.service.Impl;
 
+import com.ilyaKovalenko.SelfWritedTaskList.domain.Exception.IncorrectSecretKeyException;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.User.User;
 import com.ilyaKovalenko.SelfWritedTaskList.service.AuthService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
@@ -78,6 +79,12 @@ public class AuthServiceImpl implements AuthService {
         String accessKey = userService.getAccessKey(id);
         if(attemptAccessKey.equals(accessKey)){
             userService.activateUser(id);
+        }
+        else{
+            Integer remainingAttempt = userService.checkAbilityToConfirm(id);
+            throw new IncorrectSecretKeyException("Invalid password. " +
+                    (remainingAttempt == 5 ? "You need to register your user again." : "Remaining attempts: " + remainingAttempt));
+
         }
         return userMapper.toDto(user);
     }

@@ -102,4 +102,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
         """, nativeQuery = true)
     void deleteWiredTasks(@Param("id") Long id);
 
+
+    @Query(value = "SELECT registration_attempt FROM unconfirmed_users WHERE user_id = :userId", nativeQuery = true)
+    Integer findRemainingAttempts(@Param("userId") Long userId);
+
+    // Нативный SQL-запрос для обновления количества попыток подтверждения
+    @Modifying
+    @Query(value = "UPDATE unconfirmed_users SET registration_attempt = :attempts WHERE user_id = :userId", nativeQuery = true)
+    void changeAttemptsNumber(@Param("userId") Long userId, @Param("attempts") int attempts);
+
 }

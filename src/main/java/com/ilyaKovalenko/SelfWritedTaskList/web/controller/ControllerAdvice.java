@@ -39,6 +39,10 @@ public class ControllerAdvice {
         return new ExceptionBody(e.getMessage());
     }
 
-
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionBody handleAllErrors(Exception e){
+        return new ExceptionBody(e.getMessage());
+    }
 
 }

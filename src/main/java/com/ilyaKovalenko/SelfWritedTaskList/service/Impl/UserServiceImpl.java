@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final Duration duration = Duration.ofDays(1);
+    private static final int MAX_ATTEMPTS_TO_CONFIRM = 5;
 
     @Override
     @Transactional(readOnly = true)
@@ -154,7 +155,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String getAccessKey(Long id) {
-        return userRepository.findAccessKeyByUserId(id).orElseThrow(() -> new ResourceNotFoundException("Your account already approved or you need to register"));
+        return userRepository.findAccessKeyByUserId(id).orElseThrow(() -> new ResourceNotFoundException("Your account dont need confirmation"));
     }
 
     @Transactional
@@ -163,5 +164,25 @@ public class UserServiceImpl implements UserService {
     public void activateUser(Long id) {
         userRepository.setUserRole(id);
         userRepository.deleteActivateUserFromUncomfired(id);
+    }
+
+    @Override
+    @Transactional
+    public Integer checkAbilityToConfirm(Long id) {
+        // Получаем текущее количество оставшихся попыток
+        Integer attempts = userRepository.findRemainingAttempts(id);
+
+        // Увеличиваем количество попыток на 1
+        attempts++;
+
+        // Обновляем количество попыток в БД
+        userRepository.changeAttemptsNumber(id, attempts);
+
+        // Если достигнуто максимальное количество попыток (например, 5), удаляем пользователя
+        if (attempts >= 5) {
+            userRepository.deleteById(id);
+        }
+
+        return attempts;
     }
 }

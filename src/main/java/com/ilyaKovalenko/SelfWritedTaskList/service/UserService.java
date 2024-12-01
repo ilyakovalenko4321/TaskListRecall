@@ -28,5 +28,7 @@ public interface UserService {
 
     void activateUser(Long id);
 
+    Integer checkAbilityToConfirm(Long id);
+
 
 }
