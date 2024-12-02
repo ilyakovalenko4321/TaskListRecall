@@ -35,7 +35,7 @@ public class UserController {
         return userMapper.toDto(user);
     }
 
-    @PutMapping()
+    @PutMapping("/{id}")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#dto.id)")
     public UserDto update(@Validated(OnUpdate.class) @RequestBody UserDto dto){
         User user = userMapper.toEntity(dto);

@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.sql.Timestamp;
 import java.util.List;
-
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
@@ -23,7 +23,19 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             INSERT INTO users_tasks (user_id, task_id)
             VALUES (:userId, :taskId)
             """, nativeQuery = true)
+    void assignTaskToUser(Long userId, Long taskId);
 
-    void assignTask(Long userId, Long taskId);
+    @Modifying
+    @Query(value = """
+            INSERT INTO tasks_images (task_id, image)
+            VALUES (:id, :fileName)
+            """, nativeQuery = true)
+    void addImage(@Param("id") Long id, @Param("fileName") String fileName);
 
+    @Query(value = """
+             SELECT * FROM tasks t
+             WHERE t.expiration_date is not null
+             AND t.expiration_date between :start and :end
+            """, nativeQuery = true)
+    List<Task> findAllSoonTask(@Param("start") Timestamp start, @Param("end") Timestamp end);
 }

@@ -6,23 +6,49 @@ spring:
 
   data:
     redis:
-      host: redis
-      port: 6379
-      password:
+      host: localhost
+      port: 6380
+      password: Rts28022007
+
+  liquibase:
+    change-log: classpath*:liquibase/db.changelog.yaml
+    enabled: true
+    default-schema: tasklist
 
   datasource:
     url: jdbc:postgresql://localhost:5432/tasklist?currentSchema=tasklist
     username: postgres
     password: Rts28022007
     driver-class-name: org.postgresql.Driver
+
   sql:
     init:
       mode: never
       continue-on-error: false
 
+  mail:
+    host: smtp.gmail.com
+    username: tasklisttestmail@gmail.com
+    password: rkbnyuersmgjukyz
+    port: 587
+    properties:
+      mail:
+        debug: false
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 security:
   jwt:
     secret: $2a$12$N1saILpPtMcFJjDx3f.9xulFPFZaoqAd118RNQ0koJBU2Hfdh0sgq
-    access: 60
+    access: 20
     refresh: 1440
+
+minio:
+  bucket: images
+  url: http:/localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin

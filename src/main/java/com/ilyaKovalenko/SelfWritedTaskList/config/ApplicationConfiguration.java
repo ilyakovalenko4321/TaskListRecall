@@ -1,7 +1,9 @@
 package com.ilyaKovalenko.SelfWritedTaskList.config;
 
+import com.ilyaKovalenko.SelfWritedTaskList.service.props.MinioProperties;
 import com.ilyaKovalenko.SelfWritedTaskList.web.security.JwtTokenFilter;
 import com.ilyaKovalenko.SelfWritedTaskList.web.security.JwtTokenProvider;
+import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,35 +29,43 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class ApplicationConfiguration {
 
     private final JwtTokenProvider tokenProvider;
-
+    private final MinioProperties minioProperties;
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public MinioClient minioClient() {
+        return MinioClient.builder()
+                .endpoint(minioProperties.getUrl())
+                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
+                .build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement
-                        (sessionManagement  -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        (sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(
                                 (request, response, authException) -> {
                                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
                                     response.getWriter().write(authException.getMessage());
                                 })
-                                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                                    response.setStatus(HttpStatus.FORBIDDEN.value());
-                                    response.getWriter().write(accessDeniedException.getMessage());
-                                }))
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpStatus.FORBIDDEN.value());
+                            response.getWriter().write(accessDeniedException.getMessage());
+                        }))
                 .authorizeHttpRequests(configurer -> configurer
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
@@ -67,6 +77,7 @@ public class ApplicationConfiguration {
         return httpSecurity.build();
 
     }
+
 
 
 }
