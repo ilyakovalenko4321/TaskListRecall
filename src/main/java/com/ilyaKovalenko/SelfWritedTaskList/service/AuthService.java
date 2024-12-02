@@ -12,5 +12,7 @@ public interface AuthService {
 
     UserDto confirmEmail(JwtRequest request);
 
+    void logout(String token);
+
 
 }

@@ -1,7 +1,9 @@
 package com.ilyaKovalenko.SelfWritedTaskList.service.Impl;
 
 import com.ilyaKovalenko.SelfWritedTaskList.domain.Exception.IncorrectSecretKeyException;
+import com.ilyaKovalenko.SelfWritedTaskList.domain.Token.Token;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.User.User;
+import com.ilyaKovalenko.SelfWritedTaskList.repository.SessionRepositoryAccess;
 import com.ilyaKovalenko.SelfWritedTaskList.service.AuthService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.auth.JwtRequest;
@@ -23,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserMapper userMapper;
-
+    private final SessionRepositoryAccess sessionRepository;
 
     //ToDO: создать logout для удаления user или его token
 
@@ -61,9 +63,21 @@ public class AuthServiceImpl implements AuthService {
         jwtResponse.setId(user.getId());
         jwtResponse.setUsername(user.getUsername());
 
-        jwtResponse.setAccessToken(jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
-        jwtResponse.setRefreshToken(jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getUsername());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername());
 
+
+        jwtResponse.setAccessToken(accessToken);
+        jwtResponse.setRefreshToken(refreshToken);
+
+
+        Token accessTokenEntity = new Token();
+        accessTokenEntity.setToken(accessToken);
+        sessionRepository.save(accessTokenEntity);
+
+        Token refreshTokenEntity = new Token();
+        refreshTokenEntity.setToken(refreshToken);
+        sessionRepository.save(refreshTokenEntity);
         return jwtResponse;
     }
 
@@ -90,6 +104,11 @@ public class AuthServiceImpl implements AuthService {
             throw new IncorrectSecretKeyException("Invalid password. " + (remainingAttempt == 5 ? "You need to register your user again." : "Remaining attempts: " + remainingAttempt));
         }
         return userMapper.toDto(user);
+    }
+
+    @Override
+    public void logout(String token){
+        sessionRepository.logout(token);
     }
 
 }

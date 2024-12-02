@@ -1,8 +1,10 @@
 package com.ilyaKovalenko.SelfWritedTaskList.web.security;
 
 import com.ilyaKovalenko.SelfWritedTaskList.domain.Exception.AccessDeniedException;
+import com.ilyaKovalenko.SelfWritedTaskList.domain.Token.Token;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.User.Role;
 import com.ilyaKovalenko.SelfWritedTaskList.domain.User.User;
+import com.ilyaKovalenko.SelfWritedTaskList.repository.SessionRepositoryAccess;
 import com.ilyaKovalenko.SelfWritedTaskList.service.UserService;
 import com.ilyaKovalenko.SelfWritedTaskList.service.props.JwtProperties;
 import com.ilyaKovalenko.SelfWritedTaskList.web.dto.auth.JwtResponse;
@@ -12,6 +14,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +37,7 @@ public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
     private final UserDetailsService userDetailsService;
     private final UserService userService;
+    private final SessionRepositoryAccess sessionRepositoryAccess;
     private Key key;
 
     @PostConstruct
@@ -41,11 +45,10 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
-    public String createAccessToken(Long userId, String username, Set<Role> roles) {
+    public String createAccessToken(Long userId, String username) {
         Claims claims = Jwts.claims()
                 .subject(username)
                 .add("id", userId)
-                //.add("role", resolveRoles(roles))
                 .build();
 
         Instant validity = Instant.now().plus(jwtProperties.getAccess(), ChronoUnit.MINUTES);
@@ -88,20 +91,27 @@ public class JwtTokenProvider {
         User user = userService.getById(userId);
         jwtResponse.setId(userId);
         jwtResponse.setUsername(user.getUsername());
-        jwtResponse.setAccessToken(createAccessToken(userId, user.getUsername(), user.getRoles()));
+        jwtResponse.setAccessToken(createAccessToken(userId, user.getUsername()));
         jwtResponse.setRefreshToken(createRefreshToken(userId, user.getUsername()));
         return jwtResponse;
 
     }
 
     public boolean validateToken(String token) {
-        Jws<Claims> claims = Jwts
-                .parser()
-                .verifyWith((SecretKey) key)
-                .build()
-                .parseSignedClaims(token);
+        try {
+            Jws<Claims> claims = Jwts
+                    .parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token);
+            if (sessionRepositoryAccess.confirm(token)) {
+                return claims.getPayload().getExpiration().after(new Date());
+            }
 
-        return claims.getPayload().getExpiration().after(new Date());
+        }catch (Exception e) {
+            return false;
+        }
+        return false;
     }
 
     private Long getId(String token) {
@@ -130,6 +140,14 @@ public class JwtTokenProvider {
         String username = getUsername(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    @Scheduled(cron = "0 0/5 * * * *")
+    public void deleteOutdatedTokens(){
+        List<Token> tokens = sessionRepositoryAccess.findAll();
+        tokens.stream()
+                .filter(token -> !validateToken(token.getToken()))
+                .forEach(sessionRepositoryAccess::delete);
     }
 
 }

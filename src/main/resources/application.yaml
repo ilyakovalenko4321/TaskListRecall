@@ -44,7 +44,7 @@ spring:
 security:
   jwt:
     secret: $2a$12$N1saILpPtMcFJjDx3f.9xulFPFZaoqAd118RNQ0koJBU2Hfdh0sgq
-    access: 60
+    access: 20
     refresh: 1440
 
 minio:

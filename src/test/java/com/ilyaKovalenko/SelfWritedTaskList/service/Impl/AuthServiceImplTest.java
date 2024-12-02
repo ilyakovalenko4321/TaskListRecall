@@ -60,7 +60,7 @@ public class AuthServiceImplTest {
         user.setRoles(roles);
         Mockito.when(userService.getByUsername(username))
                 .thenReturn(user);
-        Mockito.when(tokenProvider.createAccessToken(userId, username, roles))
+        Mockito.when(tokenProvider.createAccessToken(userId, username))
                 .thenReturn(accessToken);
         Mockito.when(tokenProvider.createRefreshToken(userId, username))
                 .thenReturn(refreshToken);

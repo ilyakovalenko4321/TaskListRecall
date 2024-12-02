@@ -21,7 +21,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
-
     private final UserMapper userMapper;
 
     @PostMapping(path = "/login")
@@ -45,6 +44,11 @@ public class AuthController {
     @PostMapping(path = "/refresh")
     public JwtResponse refresh(@RequestBody String refreshToken){
         return authService.refresh(refreshToken);
+    }
+
+    @DeleteMapping("/logout")
+    public void logout(@RequestBody String refreshToken){
+        authService.logout(refreshToken);
     }
 
 }
